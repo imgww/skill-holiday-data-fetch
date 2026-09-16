@@ -1,14 +1,14 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-validate_fetch.py — 采集门禁自检 + 导出兼容 (v1.2)
+validate_fetch.py — 采集门禁自检 + 导出兼容 (v1.2.0)
 
 用法:
     python validate_fetch.py --workspace <主JSON> [--min-rows 35] [--check-snapshots]
     python validate_fetch.py --workspace <主JSON> --export-csv --out <目录>
     python validate_fetch.py --workspace <主JSON> --export-l2 --out <目录>
 
-校验项 (对齐 references/collection-log.md 与 holiday-keywords.md v1.2):
+校验项 (对齐 references/collection-log.md 与 holiday-keywords.md v1.2.0):
   1. 字段完整性: L1 必备 22 字段 / L2 必备字段; 可信度纪律
   2. 行数门禁分档: 基础线(春节/十一≥35, 五一/端午/独立中秋≥25, 暑假≥30)
                    丰富线(春节/十一≥60, 五一/端午/独立中秋≥45, 暑假≥55)
@@ -20,7 +20,7 @@ validate_fetch.py — 采集门禁自检 + 导出兼容 (v1.2)
   7. 快照校验 (--check-snapshots): JSON 中 snapshot 非"未存"的文件必须真实存在
      历史导入行(快照=未存-历史导入)单独统计, 不计入本轮快照覆盖率
   8. 丰富度评分 (0-100): 行数30(仅计本轮) + 维度30 + 地域20 + 来源20
-  9. 观测序列化统计 (v1.2): 本轮新增占比<40% WARN; 预计/实测对照未回填 WARN; 同源同载体重复率 WARN
+  9. 观测序列化统计 (v1.2.0): 本轮新增占比<40% WARN; 预计/实测对照未回填 WARN; 同源同载体重复率 WARN
 
 导出:
   --export-csv : 筛 layer=L1, 导出标准 22 字段 CSV
@@ -45,7 +45,7 @@ L2_REQUIRED = ["现象标签", "主题归属", "现象描述", "素材类型", "
 MIN_ROWS = {"春节": 35, "十一": 35, "五一": 25, "端午": 25, "中秋": 25, "暑假": 30}
 RICH_ROWS = {"春节": 60, "十一": 60, "五一": 45, "端午": 45, "中秋": 45, "暑假": 55}
 
-# 主题/地域粒度枚举白名单 (R2 修复; 覆盖 v1.1 实际产出 13 种)
+# 主题/地域粒度枚举白名单 (R2 修复; 覆盖 v1.1.0 实际产出 13 种)
 THEME_WHITELIST = {"总体", "交通出行", "景区目的地", "酒店住宿", "平台渠道", "旅行社",
                    "消费宏观", "游客画像", "新消费", "支付交易", "出入境", "派生指标", "分省/分市"}
 THEME_DEPRECATED = {"支付": "支付交易", "酒店": "酒店住宿", "平台": "平台渠道", "交通": "交通出行",
@@ -87,7 +87,7 @@ def check_fields(items):
             if missing:
                 problems.append(f"第{i}条(L1) 缺字段: {missing}")
             # 可信度纪律: 推算/测算/弱溯源/定性(非定量) 强制 D; 机构实测复合指标(如 STR RevPAR)按实测等级
-            # v1.2 口径: 官方权威机构「预计」可标 A/B/C (R1 修复, 不强制 D)
+            # v1.2.0 口径: 官方权威机构「预计」可标 A/B/C (R1 修复, 不强制 D)
             dforce = (
                 it.get("数据性质") == "推算"
                 or it.get("口径类型") in ("测算", "弱溯源")
@@ -225,7 +225,7 @@ def check_region_distribution(items):
 
 
 def check_observation_metrics(items):
-    """v1.2: 预测/实测对照 + 观测重复率 + 本轮新增占比"""
+    """v1.2.0: 预测/实测对照 + 观测重复率 + 本轮新增占比"""
     l1 = [i for i in items if i.get("layer") == "L1"]
     n_total = len(items)
     n_history = sum(1 for i in items if is_history(i))
@@ -267,7 +267,7 @@ def check_snapshots(items, ws_root):
     for it in items:
         snap = it.get("snapshot", "")
         if snap and not str(snap).startswith("未存"):
-            if not (ws_root / snap).exists():  # v1.1 修复: 用工作区根目录拼接
+            if not (ws_root / snap).exists():  # v1.1.0 修复: 用工作区根目录拼接
                 missing.append(f"{it.get('id')}: 快照缺失 {snap}")
     return missing
 
@@ -317,7 +317,7 @@ def export_l2(items, out_path, meta):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="采集门禁自检 + 导出 (v1.2)")
+    ap = argparse.ArgumentParser(description="采集门禁自检 + 导出 (v1.2.0)")
     ap.add_argument("--workspace", required=True, help="主 JSON 路径")
     ap.add_argument("--min-rows", type=int, default=None, help="覆盖基础线")
     ap.add_argument("--check-snapshots", action="store_true", help="校验快照文件存在性")
@@ -349,7 +349,7 @@ def main():
     print(f"  条目总数={total} (L1={l1_count}, L2={l2_count})  基础线={min_rows} 丰富线={rich_rows}")
 
     ok = True
-    # 0 观测序列化统计 (v1.2)
+    # 0 观测序列化统计 (v1.2.0)
     obs = check_observation_metrics(items)
     print(f"  [INFO] 观测: 本轮新增 {obs['n_current']} / 历史导入 {obs['n_history']} | "
           f"预计 {obs['pred']} / 实测 {obs['actual']} / 已回填对照 {obs['linked']}")
@@ -421,7 +421,7 @@ def main():
         print("  [FAIL] 推算/预计行占比超过 30%")
         ok = False
 
-    # 7 快照 (v1.2: 历史导入行单独统计, 不计入本轮覆盖率)
+    # 7 快照 (v1.2.0: 历史导入行单独统计, 不计入本轮覆盖率)
     if args.check_snapshots:
         missing = check_snapshots(items, ws_path.parent)
         round_entries = [i for i in items if not is_history(i)]

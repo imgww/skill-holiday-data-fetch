@@ -39,7 +39,7 @@ def empty_workspace(year, holiday, region, today):
             "updated_at": today,
             "rounds": [],
             "caliber_version": "holiday-data-report-caliber-v2.1",
-            "holiday_config_version": "holiday-keywords-v1.0",
+            "holiday_config_version": "holiday-keywords-v1.0.0",
             "merge_notes": [],
             "counts": {"L1": 0, "L2": 0, "snapshots": 0},
         },

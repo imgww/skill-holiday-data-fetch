@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-_merge_core.py — 分层同一性判定核心（v1.2 新增）
+_merge_core.py — 分层同一性判定核心（v1.2.0 新增）
 
 被 merge_rounds.py 与 import_history.py 复用。实现《数据同一性分层判定》L1–L5：
 

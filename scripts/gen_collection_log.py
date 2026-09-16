@@ -1,7 +1,7 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-gen_collection_log.py — 从 holiday-data-fetch.json 自动生成标准格式采集日志 (v1.2)
+gen_collection_log.py — 从 holiday-data-fetch.json 自动生成标准格式采集日志 (v1.2.0)
 
 用法:
     python gen_collection_log.py --workspace <主JSON> [--out <目录>]
@@ -10,7 +10,7 @@ gen_collection_log.py — 从 holiday-data-fetch.json 自动生成标准格式�
     <workspace目录>/采集日志.csv
     列: 检索关键词 | 检索时间 | 标题 | 来源机构 | 报告/资料名 | 发布时间 | URL | 内容摘要 | 快照路径 | 层(layer) | 状态 | 观测批次 | 同源复用
 
-v1.2 新增:
+v1.2.0 新增:
   - 观测批次列: 本轮 R1/R2…, 历史导入 H1/H2… (R5/导入批次可追溯)
   - 同源复用列: 快照文件被 ≥2 条引用时标 "是-共{n}条" (R5 修复)
   - 历史导入行状态标 "历史导入"
@@ -76,7 +76,7 @@ def to_row(it, snap_counter):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="自动生成标准采集日志 CSV (v1.2)")
+    ap = argparse.ArgumentParser(description="自动生成标准采集日志 CSV (v1.2.0)")
     ap.add_argument("--workspace", required=True, help="主 JSON 路径")
     ap.add_argument("--out", default=None, help="输出目录 (默认 workspace 同目录)")
     args = ap.parse_args()

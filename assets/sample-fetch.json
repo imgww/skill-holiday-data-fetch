@@ -9,7 +9,7 @@
     "updated_at": "2026-08-28",
     "rounds": ["2026-08-27-R1", "2026-08-28-R2"],
     "caliber_version": "holiday-data-report-caliber-v2.1",
-    "holiday_config_version": "holiday-keywords-v1.1",
+    "holiday_config_version": "holiday-keywords-v1.1.0",
     "merge_notes": [
       "2026-08-27-R1: 首轮采集 10 条",
       "2026-08-28-R2: 新增 12 条, 冲突暂存 1 条"

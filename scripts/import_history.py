@@ -1,13 +1,13 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-import_history.py — 历史数据导入器（v1.2 新增）
+import_history.py — 历史数据导入器（v1.2.0 新增）
 
 将历史版数据导入主工作区 JSON，作为"存量基线"（观测批次=H{n}）叠加，防"越采越少"。
 
 支持输入：
   - 历史版 CSV（22 字段：`*消费数据集*.csv` / `节假日消费数据集_总览.csv`）
-  - v1.0 / v1.1 JSON（`holiday-data-fetch.json`，schema=holiday-data-fetch-v1）
+  - v1.0.0 / v1.1.0 JSON（`holiday-data-fetch.json`，schema=holiday-data-fetch-v1）
   - L2 现象素材库 JSON（schema=phenomena-library-v1）
   - 目录（自动扫描上述文件，跳过 round_*.json 中间产物）
 
@@ -15,7 +15,7 @@ import_history.py — 历史数据导入器（v1.2 新增）
     python import_history.py --workspace <主JSON> --source <历史文件或目录> [--batch H1] [--dry-run] [--keep-snapshots]
 
 流程：
-    1. 格式识别（CSV / v1.0/v1.1 JSON / 现象素材库 JSON）
+    1. 格式识别（CSV / v1.0.0/v1.1.0 JSON / 现象素材库 JSON）
     2. 质量过滤（剔除 待核 / 数值类型污染 / 无URL / 非目标年度节假日）
     3. 格式归一化 + 字段补齐（数值类型/单位粒度/数据性质/地域粒度 归一，缺字段补默认）
     4. 批次标注（数据来源=历史导入, 观测批次=H{n}, round=历史导入, 采集时间=导入时刻）
@@ -43,7 +43,7 @@ PROVINCE_NAMES = ["广东", "浙江", "江苏", "四川", "山东", "河南", "�
 CITY_NAMES = ["北京", "上海", "广州", "成都", "重庆", "杭州", "西安", "武汉", "南京", "深圳",
               "长沙", "郑州", "青岛", "天津", "苏州", "三亚", "厦门", "昆明", "哈尔滨", "长春"]
 
-# 合法数值类型（v1.1 收敛为 4 类 + 复合）
+# 合法数值类型（v1.1.0 收敛为 4 类 + 复合）
 VALID_VALUE_TYPE = {"水平值", "增长率", "指数", "定性", "复合"}
 VALUE_TYPE_NORM = {"复合值": "复合", "增速": "增长率", "倍数": "增长率", "占比": "水平值", "区间": "定性"}
 # 明确的单位粒度污染值（应归一到 单位 或置 "—"）
@@ -232,7 +232,7 @@ def csv_to_items(path, target_year, target_holiday, region):
             # 推算行补推算依据（备注含公式时）
             if it["数据性质"] == "推算" and not it.get("推算依据"):
                 it["推算依据"] = ""
-            # 可信度纪律: 推算/测算/弱溯源/定性 强制 D（与 v1.1 门禁一致，历史脏等级降级）
+            # 可信度纪律: 推算/测算/弱溯源/定性 强制 D（与 v1.1.0 门禁一致，历史脏等级降级）
             if (it["数据性质"] == "推算" or it["口径类型"] in ("测算", "弱溯源") or it["数值类型"] == "定性"):
                 it["可信度等级"] = "D"
             items.append(it)
@@ -240,7 +240,7 @@ def csv_to_items(path, target_year, target_holiday, region):
 
 
 def json_fetch_to_items(path, target_year, target_holiday, keep_snapshots):
-    """v1.0/v1.1 JSON → 条目列表（L1+L2），仅取目标年度节假日"""
+    """v1.0.0/v1.1.0 JSON → 条目列表（L1+L2），仅取目标年度节假日"""
     with path.open("r", encoding="utf-8-sig") as f:
         data = json.load(f)
     meta = data.get("meta", {})
@@ -346,12 +346,12 @@ def copy_snapshot_files(source_path, ws_root):
 
 
 def main():
-    ap = argparse.ArgumentParser(description="历史数据导入器（v1.2）")
+    ap = argparse.ArgumentParser(description="历史数据导入器（v1.2.0）")
     ap.add_argument("--workspace", required=True, help="主 JSON 路径")
     ap.add_argument("--source", required=True, help="历史数据文件或目录")
     ap.add_argument("--batch", default=None, help="观测批次码，如 H1；缺省自动取下一个 H 批次")
     ap.add_argument("--dry-run", action="store_true", help="只输出导入报告，不写回")
-    ap.add_argument("--keep-snapshots", action="store_true", help="导入 v1.0/v1.1 JSON 时保留原快照路径并复制快照文件")
+    ap.add_argument("--keep-snapshots", action="store_true", help="导入 v1.0.0/v1.1.0 JSON 时保留原快照路径并复制快照文件")
     args = ap.parse_args()
 
     from _merge_core import layered_merge, now_str, batch_of

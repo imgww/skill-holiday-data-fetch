@@ -1,12 +1,12 @@
 ﻿#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-merge_rounds.py — 增量归集: 将新采集轮次合并进主 JSON（v1.2 分层同一性判定）
+merge_rounds.py — 增量归集: 将新采集轮次合并进主 JSON（v1.2.0 分层同一性判定）
 
 用法:
     python merge_rounds.py --workspace <主JSON> --round-file <新轮次JSON> [--round-id R2]
 
-规则（v1.2，对齐 references/collection-log.md 与 _merge_core.py）:
+规则（v1.2.0，对齐 references/collection-log.md 与 _merge_core.py）:
   - L1 去重键: (URL, 报告/资料名, 数据点, 口径版本, 统计窗口, 数据性质) 全一致 → 去重
   - L2 去重键: (现象描述, 来源机构, 来源URL)
   - L2 同源异性质: 半键一致但 数据性质 不同（预计 vs 实际）→ 并存 + 观测关联自动回填
@@ -34,7 +34,7 @@ REQUIRED_LAYER_FIELDS = {"L1": ["layer", "主题", "数据点", "数值", "单�
 
 
 def main():
-    ap = argparse.ArgumentParser(description="增量归集: 合并新轮次到主 JSON (v1.2)")
+    ap = argparse.ArgumentParser(description="增量归集: 合并新轮次到主 JSON (v1.2.0)")
     ap.add_argument("--workspace", required=True, help="主 JSON 路径")
     ap.add_argument("--round-file", required=True, help="新轮次 JSON 路径")
     ap.add_argument("--round-id", default=None, help="轮次 ID, 如 2026-08-27-R2; 缺省自动生成")
