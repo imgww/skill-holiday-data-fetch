@@ -36,7 +36,7 @@ except Exception:
     pass
 
 # ---- 常量 ----
-HOLIDAY_SEQ = {"春节": "CH", "端午": "DW", "五一": "WY", "暑假": "SH", "中秋": "MQ", "十一": "SY"}
+HOLIDAY_SEQ = {"春节": "CH", "端午": "DW", "五一": "WY", "暑期": "SH", "中秋": "MQ", "十一": "SY"}
 PROVINCE_NAMES = ["广东", "浙江", "江苏", "四川", "山东", "河南", "湖北", "湖南", "福建", "安徽",
                   "河北", "陕西", "云南", "贵州", "辽宁", "吉林", "黑龙江", "山西", "江西", "广西",
                   "海南", "重庆", "北京", "上海", "天津", "内蒙古", "新疆", "西藏", "宁夏", "甘肃", "青海"]
@@ -87,6 +87,15 @@ def _norm_text(v):
     if v is None:
         return ""
     return str(v).strip()
+
+
+# 节假日术语兼容：旧版数据标"暑假"，v1.2.0 起统一为"暑期"（导入不丢历史行）
+HOLIDAY_ALIAS = {"暑假": "暑期"}
+
+
+def _norm_holiday(x):
+    """节假日术语归一（幂等）："暑假"→"暑期"，其余原样"""
+    return HOLIDAY_ALIAS.get(_norm_text(x), _norm_text(x))
 
 
 def _norm_caliber(cal):
@@ -160,10 +169,10 @@ def quality_problem(row, target_year, target_holiday):
     """返回过滤原因；无则返回 None。row 为 dict（统一字段）"""
     # 非目标年度/节假日
     y = _norm_text(row.get("年份") or row.get("year"))
-    h = _norm_text(row.get("节日") or row.get("holiday"))
+    h = _norm_holiday(row.get("节日") or row.get("holiday"))
     if y and str(y) != str(target_year):
         return f"年度不符({y})"
-    if h and h != target_holiday:
+    if h and _norm_holiday(h) != _norm_holiday(target_holiday):
         return f"节假日不符({h})"
     # 待核
     if "待核" in _norm_text(row.get("口径类型")):
@@ -251,7 +260,7 @@ def json_fetch_to_items(path, target_year, target_holiday, keep_snapshots):
     filtered = []
     if src_year is not None and str(src_year) != str(target_year):
         return items, read, [(path.name, f"年度不符({src_year})")]
-    if src_holiday and src_holiday != target_holiday:
+    if src_holiday and _norm_holiday(src_holiday) != _norm_holiday(target_holiday):
         return items, read, [(path.name, f"节假日不符({src_holiday})")]
     for it in data.get("items", []):
         read += 1
@@ -290,7 +299,7 @@ def json_l2_to_items(path, target_year, target_holiday):
     filtered = []
     if y is not None and str(y) != str(target_year):
         return items, 0, [(path.name, f"年度不符({y})")]
-    if h and h != target_holiday:
+    if h and _norm_holiday(h) != _norm_holiday(target_holiday):
         return items, 0, [(path.name, f"节假日不符({h})")]
     read = 0
     for it in data.get("items", []):

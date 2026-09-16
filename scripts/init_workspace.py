@@ -10,7 +10,7 @@ init_workspace.py — 初始化/读取 holiday-data-fetch 采集工作区
   - 若主文件 holiday-data-fetch.json 不存在: 创建含 meta 的空工作区(仅 meta, items=[])
   - 若已存在: 读取并打印归集状态(rounds/counts/updated_at), 提示续采, 不覆盖
   - --force: 重建空工作区(慎用, 会清空现有归集)
-  - 节假日校验: 春节/端午/五一/暑假/中秋/十一
+  - 节假日校验: 春节/端午/五一/暑期/中秋/十一
 """
 import argparse
 import json
@@ -24,8 +24,8 @@ except Exception:
     pass
 
 MAIN_FILE = "holiday-data-fetch.json"
-HOLIDAYS = ["春节", "端午", "五一", "暑假", "中秋", "十一"]
-HOLIDAY_SEQ = {"春节": "CH", "端午": "DW", "五一": "WY", "暑假": "SH", "中秋": "MQ", "十一": "SY"}
+HOLIDAYS = ["春节", "端午", "五一", "暑期", "中秋", "十一"]
+HOLIDAY_SEQ = {"春节": "CH", "端午": "DW", "五一": "WY", "暑期": "SH", "中秋": "MQ", "十一": "SY"}
 
 
 def empty_workspace(year, holiday, region, today):
